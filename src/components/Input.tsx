@@ -76,21 +76,28 @@ const Input: React.FC<Props> = (e: Props) => {
             )}`;
             const input = inputRef?.current;
 
-            if (
+            const singleIsValid = asSingle && start.length === 10 && dateIsValid(new Date(start));
+
+            const rangeIsValid =
                 start.length === 10 &&
                 end.length === 10 &&
                 dateIsValid(new Date(start)) &&
                 dateIsValid(new Date(end)) &&
-                dayjs(start).isBefore(end)
-            ) {
+                dayjs(start).isBefore(end);
+
+            if (singleIsValid || rangeIsValid) {
                 changeDatepickerValue(
                     {
                         startDate: start,
-                        endDate: end
+                        endDate: asSingle ? start : end
                     },
                     e.target
                 );
-                changeDayHover(dayjs(end).add(-1, "day").format(DATE_FORMAT));
+                if (asSingle) {
+                    changeDayHover(start);
+                } else {
+                    changeDayHover(dayjs(end).add(-1, "day").format(DATE_FORMAT));
+                }
                 hideDatepicker();
                 if (input) {
                     input.blur();
@@ -98,7 +105,7 @@ const Input: React.FC<Props> = (e: Props) => {
             }
             changeInputText(e.target.value);
         },
-        [changeDatepickerValue, changeDayHover, changeInputText, hideDatepicker]
+        [asSingle, changeDatepickerValue, changeDayHover, changeInputText, hideDatepicker]
     );
 
     // UseEffects && UseLayoutEffect

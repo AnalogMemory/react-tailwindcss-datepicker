@@ -1405,23 +1405,30 @@ const Input = (e) => {
         const start = `${inputValue.slice(0, 4)}-${inputValue.slice(5, 7)}-${inputValue.slice(8, 10)}`;
         const end = `${inputValue.slice(13, 17)}-${inputValue.slice(18, 20)}-${inputValue.slice(21, inputValue.length)}`;
         const input = inputRef?.current;
-        if (start.length === 10 &&
+        const singleIsValid = asSingle && start.length === 10 && dateIsValid(new Date(start));
+        const rangeIsValid = start.length === 10 &&
             end.length === 10 &&
             dateIsValid(new Date(start)) &&
             dateIsValid(new Date(end)) &&
-            require$$0(start).isBefore(end)) {
+            require$$0(start).isBefore(end);
+        if (singleIsValid || rangeIsValid) {
             changeDatepickerValue({
                 startDate: start,
-                endDate: end
+                endDate: asSingle ? start : end
             }, e.target);
-            changeDayHover(require$$0(end).add(-1, "day").format(DATE_FORMAT));
+            if (asSingle) {
+                changeDayHover(start);
+            }
+            else {
+                changeDayHover(require$$0(end).add(-1, "day").format(DATE_FORMAT));
+            }
             hideDatepicker();
             if (input) {
                 input.blur();
             }
         }
         changeInputText(e.target.value);
-    }, [changeDatepickerValue, changeDayHover, changeInputText, hideDatepicker]);
+    }, [asSingle, changeDatepickerValue, changeDayHover, changeInputText, hideDatepicker]);
     // UseEffects && UseLayoutEffect
     useEffect(() => {
         const button = buttonRef?.current;
