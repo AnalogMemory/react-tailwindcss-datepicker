@@ -229,13 +229,18 @@ const Days: React.FC<Props> = ({
     );
 
     const buttonClass = useCallback(
-        (day: number, type: string) => {
+        (day: number, type: "current" | "next" | "previous") => {
             const baseClass = "flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10";
-            return cn(
-                baseClass,
-                !activeDateData(day).active ? hoverClassByDay(day) : activeDateData(day).className,
-                isDateDisabled(day, type) && "line-through"
-            );
+            if (type === "current") {
+                return cn(
+                    baseClass,
+                    !activeDateData(day).active
+                        ? hoverClassByDay(day)
+                        : activeDateData(day).className,
+                    isDateDisabled(day, type) && "line-through"
+                );
+            }
+            return cn(baseClass, isDateDisabled(day, type) && "line-through", "text-gray-400");
         },
         [activeDateData, hoverClassByDay, isDateDisabled]
     );
@@ -282,7 +287,7 @@ const Days: React.FC<Props> = ({
                     type="button"
                     key={index}
                     disabled={isDateDisabled(item, "previous")}
-                    className="flex items-center justify-center text-gray-400 h-12 w-12 lg:w-10 lg:h-10"
+                    className={`${buttonClass(item, "previous")}`}
                     onClick={() => onClickPreviousDays(item)}
                     onMouseOver={() => {
                         hoverDay(item, "previous");
@@ -314,7 +319,7 @@ const Days: React.FC<Props> = ({
                     type="button"
                     key={index}
                     disabled={isDateDisabled(index, "next")}
-                    className="flex items-center justify-center text-gray-400 h-12 w-12 lg:w-10 lg:h-10"
+                    className={`${buttonClass(item, "next")}`}
                     onClick={() => {
                         onClickNextDays(item);
                     }}
