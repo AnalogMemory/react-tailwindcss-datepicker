@@ -1084,7 +1084,12 @@ const Days = ({ calendarData, onClickPreviousDays, onClickDay, onClickNextDays }
     }, [calendarData.date, isDateTooEarly, isDateTooLate, disabledDates]);
     const buttonClass = React.useCallback((day, type) => {
         const baseClass = "flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10";
-        return classNames(baseClass, !activeDateData(day).active ? hoverClassByDay(day) : activeDateData(day).className, isDateDisabled(day, type) && "line-through");
+        if (type === "current") {
+            return classNames(baseClass, !activeDateData(day).active
+                ? hoverClassByDay(day)
+                : activeDateData(day).className, isDateDisabled(day, type) && "line-through");
+        }
+        return classNames(baseClass, isDateDisabled(day, type) && "line-through", "text-gray-400");
     }, [activeDateData, hoverClassByDay, isDateDisabled]);
     const hoverDay = React.useCallback((day, type) => {
         const object = {
@@ -1114,7 +1119,7 @@ const Days = ({ calendarData, onClickPreviousDays, onClickDay, onClickNextDays }
         }
     }, [calendarData.date, changeDayHover, changePeriod, period.end, period.start]);
     return (React__default["default"].createElement("div", { className: "grid grid-cols-7 gap-y-0.5 my-1" },
-        calendarData.days.previous.map((item, index) => (React__default["default"].createElement("button", { type: "button", key: index, disabled: isDateDisabled(item, "previous"), className: "flex items-center justify-center text-gray-400 h-12 w-12 lg:w-10 lg:h-10", onClick: () => onClickPreviousDays(item), onMouseOver: () => {
+        calendarData.days.previous.map((item, index) => (React__default["default"].createElement("button", { type: "button", key: index, disabled: isDateDisabled(item, "previous"), className: `${buttonClass(item, "previous")}`, onClick: () => onClickPreviousDays(item), onMouseOver: () => {
                 hoverDay(item, "previous");
             } }, item))),
         calendarData.days.current.map((item, index) => (React__default["default"].createElement("button", { type: "button", key: index, disabled: isDateDisabled(item, "current"), className: `${buttonClass(item, "current")}`, onClick: () => {
@@ -1122,7 +1127,7 @@ const Days = ({ calendarData, onClickPreviousDays, onClickDay, onClickNextDays }
             }, onMouseOver: () => {
                 hoverDay(item, "current");
             } }, item))),
-        calendarData.days.next.map((item, index) => (React__default["default"].createElement("button", { type: "button", key: index, disabled: isDateDisabled(index, "next"), className: "flex items-center justify-center text-gray-400 h-12 w-12 lg:w-10 lg:h-10", onClick: () => {
+        calendarData.days.next.map((item, index) => (React__default["default"].createElement("button", { type: "button", key: index, disabled: isDateDisabled(index, "next"), className: `${buttonClass(item, "next")}`, onClick: () => {
                 onClickNextDays(item);
             }, onMouseOver: () => {
                 hoverDay(item, "next");
