@@ -169,6 +169,67 @@ const Input: React.FC<Props> = (e: Props) => {
         }
     }, [e, inputRef]);
 
+    // Functions
+    const getClassName = useCallback(() => {
+        const input = inputRef.current;
+
+        if (input && typeof classNames != "undefined" && typeof classNames.input === "function") {
+            return classNames?.input(input);
+        }
+
+        const border = BORDER_COLOR.focus[primaryColor as keyof typeof BORDER_COLOR.focus];
+        const ring =
+            RING_COLOR["second-focus"][primaryColor as keyof (typeof RING_COLOR)["second-focus"]];
+        const classNameOverload = typeof inputClassName === "string" ? inputClassName : "";
+        return `relative transition-all duration-300 py-2.5 pl-4 pr-14 w-full border-gray-300 dark:bg-slate-800 dark:text-white/80 dark:border-slate-600 rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed ${border} ${ring} ${classNameOverload}`;
+    }, [inputRef, classNames, primaryColor, inputClassName]);
+
+    const handleInputChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const inputValue = e.target.value;
+            const start = `${inputValue.slice(0, 4)}-${inputValue.slice(5, 7)}-${inputValue.slice(
+                8,
+                10
+            )}`;
+            const end = `${inputValue.slice(13, 17)}-${inputValue.slice(18, 20)}-${inputValue.slice(
+                21,
+                inputValue.length
+            )}`;
+            const input = inputRef?.current;
+
+            const singleIsValid = asSingle && start.length === 10 && dateIsValid(new Date(start));
+
+            const rangeIsValid =
+                start.length === 10 &&
+                end.length === 10 &&
+                dateIsValid(new Date(start)) &&
+                dateIsValid(new Date(end)) &&
+                dayjs(start).isBefore(end);
+
+            if (singleIsValid || rangeIsValid) {
+                changeDatepickerValue(
+                    {
+                        startDate: start,
+                        endDate: asSingle ? start : end
+                    },
+                    e.target
+                );
+                if (asSingle) {
+                    changeDayHover(start);
+                } else {
+                    changeDayHover(dayjs(end).add(-1, "day").format(DATE_FORMAT));
+                }
+                hideDatepicker();
+                if (input) {
+                    input.blur();
+                }
+            }
+            changeInputText(e.target.value);
+        },
+        [asSingle, changeDatepickerValue, changeDayHover, changeInputText, hideDatepicker]
+    );
+
+    // UseEffects && UseLayoutEffect
     useEffect(() => {
         const button = buttonRef?.current;
 
